@@ -1,0 +1,41 @@
+<div class="login-header text-center mb-4">
+  <i class="bi bi-person-circle display-4 text-info"></i>
+</div>
+
+<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+  
+  <div class="mb-3">
+    <%= f.label :email, "Correo Electrónico", class: "form-label fw-semibold" %>
+    <%= f.email_field :email, 
+        autofocus: true, 
+        autocomplete: "email", 
+        class: "form-control form-control-lg", 
+        placeholder: "nombre@ejemplo.com" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :password, "Contraseña", class: "form-label fw-semibold" %>
+    <%= f.password_field :password, 
+        autocomplete: "current-password", 
+        class: "form-control form-control-lg", 
+        placeholder: "••••••••" %>
+  </div>
+
+  <% if devise_mapping.rememberable? %>
+    <div class="mb-3 form-check">
+      <%= f.check_box :remember_me, class: "form-check-input" %>
+      <%= f.label :remember_me, "Recordarme en este equipo", class: "form-check-label text-muted" %>
+    </div>
+  <% end %>
+
+  <div class="d-grid gap-2 mt-4">
+    <%= f.submit "Entrar al Sistema", class: "btn btn-info btn-lg text-white fw-bold shadow-sm" %>
+  </div>
+
+<% end %>
+
+<hr class="my-4">
+
+<div class="text-center">
+  <%= render "devise/shared/links" %>
+</div>

@@ -1,0 +1,33 @@
+<h1 class="mb-4"><i class="bi bi-receipt-cutoff"></i> Recibo de Venta</h1>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <p><strong>ID:</strong> <%= @sale.id %></p>
+    <p><strong>Total:</strong> <%= number_to_currency(@sale.total) %></p>
+    <p><strong>Fecha:</strong> <%= @sale.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+  </div>
+</div>
+
+<h3 class="mt-4"><i class="bi bi-box-seam"></i> Productos vendidos</h3>
+<table class="table table-striped table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Precio unitario</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @sale.sale_items.each do |item| %>
+      <tr>
+        <td><%= item.product.name %></td>
+        <td><%= item.quantity %></td>
+        <td><%= number_to_currency(item.price) %></td>
+        <td><%= number_to_currency(item.price * item.quantity) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "<i class='bi bi-arrow-left'></i> Volver".html_safe, sales_path, class: "btn btn-secondary" %>

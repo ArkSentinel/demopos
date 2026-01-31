@@ -1,0 +1,65 @@
+<%= form_with(model: product, local: true) do |form| %>
+  <% if product.errors.any? %>
+    <div class="alert alert-danger shadow-sm">
+      <h4 class="h6 fw-bold"><i class="bi bi-exclamation-triangle"></i> Errores:</h4>
+      <ul class="mb-0 small">
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "Nombre", class: "form-label fw-bold" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Ej. Coca Cola 2L" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, "Descripción", class: "form-label fw-bold" %>
+    <%= form.text_area :description, class: "form-control", rows: 2, placeholder: "Breve descripción del producto..." %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :price, "Precio", class: "form-label fw-bold" %>
+      <%# Solo el admin puede editar el precio %>
+      <%= form.number_field :price, 
+          step: 0.01, 
+          class: "form-control", 
+          disabled: (current_user.role != 'admin'),
+          readonly: (current_user.role != 'admin') %>
+      <% if current_user.role != 'admin' %>
+        <div class="form-text text-danger small">Solo administradores pueden cambiar el precio.</div>
+      <% end %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :quantity, "Stock Actual", class: "form-label fw-bold" %>
+      <%= form.number_field :quantity, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :category_id, "Categoría", class: "form-label fw-bold" %>
+    <%= form.collection_select :category_id, Category.all, :id, :name,
+          { include_blank: "Seleccione una categoría" },
+          { class: "form-select" } %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :photo, "Imagen del Producto", class: "form-label fw-bold" %>
+    <div class="card bg-light p-3">
+      <% if product.photo.attached? %>
+        <div class="mb-2">
+          <%= image_tag product.photo, style: "height: 100px; width: 100px; object-fit: cover;" %>
+        </div>
+      <% end %>
+      <%= form.file_field :photo, class: "form-control", accept: 'image/*' %>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2">
+    <%= form.submit "Guardar cambios", class: "btn btn-primary btn-lg shadow-sm" %>
+  </div>
+<% end %>

@@ -1,0 +1,24 @@
+<h1>Carrito de compras</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @cart.cart_items.each do |item| %>
+      <tr>
+        <td><%= item.product.name %></td>
+        <td><%= item.quantity %></td>
+        <td><%= number_to_currency(item.product.price) %></td>
+        <td><%= number_to_currency(item.quantity * item.product.price) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p><strong>Total:</strong> <%= number_to_currency(@cart.cart_items.sum { |i| i.quantity * i.product.price }) %></p>

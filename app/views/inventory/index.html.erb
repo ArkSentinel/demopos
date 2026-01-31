@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="mb-0"><i class="bi bi-box-seam"></i> Inventario</h1>
+  <%= link_to new_product_path, class: "btn btn-success" do %>
+    <i class="bi bi-plus-circle"></i> Nuevo Producto
+  <% end %>
+</div>
+
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <%= form_with url: inventory_index_path, method: :get, local: true, class: "row g-3" do |f| %>
+      <div class="col-md-4">
+        <%= f.label :q, "Buscar por nombre o descripción", class: "form-label" %>
+        <%= f.text_field :q, value: params[:q], class: "form-control" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :category_id, "Categoría", class: "form-label" %>
+        <%= f.collection_select :category_id, Category.all, :id, :name,
+              { include_blank: "Todas" },
+              { class: "form-select", selected: params[:category_id] } %>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <%= f.submit "Filtrar", class: "btn btn-primary me-2" %>
+        <%= link_to "Limpiar", inventory_index_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped table-hover shadow-sm">
+  <thead class="table-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Producto</th>
+      <th scope="col">Categoría</th>
+      <th scope="col">Precio</th>
+      <th scope="col">Stock</th>
+      <th scope="col">Última actualización</th>
+      <th scope="col">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <td><%= product.id %></td>
+        <td>
+          <strong><%= product.name %></strong><br>
+          <small class="text-muted"><%= truncate(product.description, length: 50) %></small>
+        </td>
+        <td><%= product.category&.name || "Sin categoría" %></td>
+        <td><%= number_to_currency(product.price) %></td>
+        <td>
+          <% if product.quantity > 10 %>
+            <span class="badge bg-success text-white"><%= product.quantity %></span>
+          <% elsif product.quantity > 0 %>
+            <span class="badge bg-warning text-dark"><%= product.quantity %></span>
+          <% else %>
+            <span class="badge bg-danger text-white">Agotado</span>
+          <% end %>
+        </td>
+        <td><%= product.updated_at.strftime("%d/%m/%Y %H:%M") %></td>
+        <td class="d-flex gap-2">
+          <%= link_to "<i class='bi bi-eye'></i> Ver".html_safe, product_path(product), class: "btn btn-info btn-sm" %>
+          <%= link_to "<i class='bi bi-pencil'></i> Editar".html_safe, edit_product_path(product), class: "btn btn-warning btn-sm" %>
+          <%= button_to product_path(product),
+                        method: :delete,
+                        data: { turbo_confirm: "¿Seguro que deseas eliminar #{product.name}?" },
+                        class: "btn btn-danger btn-sm" do %>
+            <i class="bi bi-trash"></i> Eliminar
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

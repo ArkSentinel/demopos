@@ -1,29 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
-    <title><%= content_for(:title) || "Demopos" %></title>
+    <title><%= content_for(:title) || "DemoPOS" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Demopos">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <style>
+      :root {
+        --sidebar-width: 260px;
+        --sidebar-collapsed-width: 80px;
+        --sidebar-bg: #1e1e2d;
+        --sidebar-active: #2b2b40;
+        --pos-blue: #009ef7;
+      }
+
+      body { background-color: #f5f8fa; min-height: 100vh; margin: 0; }
+
+      /* Sidebar Core */
+      #sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--sidebar-bg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1050;
+        height: 100vh;
+      }
+
+      #sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+
+      /* Elementos que desaparecen al colapsar */
+      #sidebar.collapsed span, 
+      #sidebar.collapsed .sidebar-header h5,
+      #sidebar.collapsed .user-info-text { display: none; }
+
+      .sidebar-header { 
+        padding: 1.5rem 1rem; 
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+      }
+
+      /* Navegación */
+      .nav-link {
+        color: #a2a3b7 !important;
+        padding: 0.8rem 1rem;
+        margin: 0.2rem 0.8rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+      }
+
+      .nav-link:hover, .nav-link.active {
+        background-color: var(--sidebar-active);
+        color: #fff !important;
+      }
+
+      .nav-link i {
+        font-size: 1.3rem;
+        min-width: 2.5rem;
+        display: inline-flex;
+        justify-content: center;
+      }
+
+      /* Contenido Principal */
+      #main-content {
+        transition: margin-left 0.3s ease;
+        margin-left: var(--sidebar-width);
+        min-height: 100vh;
+      }
+
+      #sidebar.collapsed + #main-content {
+        margin-left: var(--sidebar-collapsed-width);
+      }
+
+      /* Ajustes de Usuario */
+      .user-avatar {
+        width: 35px;
+        height: 35px;
+        background: #2b2b40;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Login Layout */
+      .login-container { 
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e1e2d 0%, #2b2b40 100%);
+      }
+    </style>
   </head>
 
   <body>
-    <%= yield %>
+    <% if user_signed_in? %>
+      <nav class="position-fixed d-flex flex-column shadow" id="sidebar">
+        <div class="sidebar-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold text-white">POS<span class="text-info">System</span></h5>
+            <button class="btn btn-sm text-light border-0 px-0" id="toggleSidebar">
+              <i class="bi bi-list fs-3"></i>
+            </button>
+          </div>
+
+          <div class="user-info mt-2">
+            <div class="d-flex align-items-center gap-32">
+              <div class="user-avatar">
+                <i class="bi bi-person text-info"></i>
+              </div>
+              <div class="user-info-text overflow-hidden">
+                <span class="d-block text-white small fw-bold text-truncate">
+                  <%= current_user.first_name %>
+                </span>
+                <span class="badge bg-primary text-white" style="font-size: 0.65rem;">
+                  <%= current_user.role&.upcase %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex-grow-1">
+          <%= link_to products_path, class: "nav-link #{'active' if current_page?(products_path)}" do %>
+            <i class="bi bi-grid"></i><span>Ventas</span>
+          <% end %>
+
+          <% if current_user.role == 'admin' %>
+            <%= link_to categories_path, class: "nav-link #{'active' if current_page?(categories_path)}" do %>
+              <i class="bi bi-tags"></i><span>Categorías</span>
+            <% end %>
+            
+            <%= link_to inventory_index_path, class: "nav-link #{'active' if current_page?(inventory_index_path)}" do %>
+              <i class="bi bi-archive"></i><span>Inventario</span>
+            <% end %>
+          <% end %>
+
+          <%= link_to sales_path, class: "nav-link #{'active' if current_page?(sales_path)}" do %>
+            <i class="bi bi-receipt"></i><span>Historial</span>
+          <% end %>
+        </div>
+
+        <div class="p-3 border-top border-secondary">
+          <%= button_to destroy_user_session_path, method: :delete, class: "nav-link text-danger w-100 border-0 bg-transparent", data: { turbo: false } do %>
+            <i class="bi bi-power"></i><span>Salir</span>
+          <% end %>
+        </div>
+      </nav>
+
+      <main id="main-content">
+        <div class="container-fluid p-4">
+          <%= yield %>
+        </div>
+      </main>
+
+    <% else %>
+      <div class="login-container d-flex align-items-center justify-content-center p-3">
+        <div class="card border-0 shadow-lg p-4" style="max-width: 450px; width: 100%; border-radius: 20px;">
+          <div class="text-center mb-4">
+            <h1 class="fw-black text-dark">POS<span class="text-primary">.</span></h1>
+            <p class="text-muted small text-uppercase fw-bold">Gestión de Punto de Venta</p>
+          </div>
+          <%= yield %>
+        </div>
+      </div>
+    <% end %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function initSidebar() {
+        const btn = document.getElementById("toggleSidebar");
+        const sidebar = document.getElementById("sidebar");
+        
+        if (btn && sidebar) {
+          // Usamos una función limpia para evitar duplicados de eventos con Turbo
+          btn.onclick = (e) => {
+            e.preventDefault();
+            sidebar.classList.toggle("collapsed");
+            // Guardar estado en localStorage si quieres que persista
+            localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+          };
+
+          // Opcional: Recuperar estado anterior
+          if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+          }
+        }
+      }
+
+      // Funciona con Turbo y carga normal
+      document.addEventListener("turbo:load", initSidebar);
+      if (!window.turbo) document.addEventListener("DOMContentLoaded", initSidebar);
+    </script>
   </body>
 </html>

@@ -1,0 +1,14 @@
+<h1>Bienvenido</h1>
+<div class="row">
+  <% Product.limit(10).each do |product| %>
+    <div class="col-md-3">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5><%= product.name %></h5>
+          <p><%= number_to_currency(product.price) %></p>
+          <%= button_to "Agregar al carrito", cart_add_path(product_id: product.id), method: :post, class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

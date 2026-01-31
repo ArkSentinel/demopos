@@ -1,0 +1,37 @@
+<div id="<%= dom_id product %>">
+  <div>
+    <strong>Name:</strong>
+    <%= product.name %>
+  </div>
+
+  <div>
+    <strong>Description:</strong>
+    <%= product.description %>
+  </div>
+
+  <div>
+    <strong>Price:</strong>
+    <%= product.price %>
+  </div>
+
+  <div>
+    <strong>Quantity:</strong>
+    <%= product.quantity %>
+  </div>
+
+  <div>
+    <strong>Category:</strong>
+    <%= product.category_id %>
+  </div>
+
+  <div>
+    <strong>Images:</strong>
+    <% if product.images.attached? %>
+      <% product.images.each do |image| %>
+        <%= image_tag image, width: 150, height: 150 %>
+      <% end %>
+    <% else %>
+      <p>No images available</p>
+    <% end %>
+  </div>
+</div>

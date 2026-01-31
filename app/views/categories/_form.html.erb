@@ -1,0 +1,19 @@
+<%= form_with(model: category, local: true) do |form| %>
+  <% if category.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><i class="bi bi-exclamation-triangle"></i> Errores:</h4>
+      <ul>
+        <% category.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "Nombre", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <%= form.submit "Guardar categoría", class: "btn btn-primary" %>
+<% end %>

@@ -1,0 +1,13 @@
+<% content_for :title, "Nueva categoría" %>
+
+<h1 class="mb-4"><i class="bi bi-plus-circle"></i> Nueva categoría</h1>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <%= render "form", category: @category %>
+  </div>
+</div>
+
+<div class="mt-3">
+  <%= link_to "<i class='bi bi-arrow-left'></i> Volver a categorías".html_safe, categories_path, class: "btn btn-secondary" %>
+</div>
