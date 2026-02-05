@@ -2,40 +2,49 @@ class CartsController < ApplicationController
   def checkout
     cart_data = params[:cart]
 
+    if cart_data.blank?
+      return render json: { error: "El carrito está vacío" }, status: :unprocessable_entity
+    end
+
     ActiveRecord::Base.transaction do
-      # Validar stock antes de crear la venta
+      # 1. Validar stock de todos los productos antes de hacer nada
       cart_data.each do |item|
         product = Product.find(item[:product_id])
         if product.quantity < item[:quantity].to_i
-          raise ActiveRecord::Rollback, "Stock insuficiente para #{product.name}"
+          raise "Stock insuficiente para #{product.name}" 
         end
       end
 
-      # Crear la venta
-      # Dentro del bloque de creación de la venta:
+      # 2. Crear la venta (Asociada al usuario logueado)
+      # Nota: Usamos create! (con signo !) para que si algo falla, salte al rescue
       sale = Sale.create!(
         total: cart_data.sum { |item| item[:quantity].to_i * item[:price].to_f },
-        user_id: current_user.id # <--- ¡Importante para saber quién vendió!
+        user: current_user
       )
 
-      # Crear items y descontar stock
+      # 3. Crear los detalles de la venta y descontar stock
       cart_data.each do |item|
         product = Product.find(item[:product_id])
-
+        
         sale.sale_items.create!(
-          product_id: product.id,
+          product: product,
           quantity: item[:quantity],
           price: item[:price]
         )
 
+        # Descontamos del inventario
         product.update!(quantity: product.quantity - item[:quantity].to_i)
       end
 
-      render json: { message: "Compra finalizada correctamente", sale_id: sale.id }
+      # 4. Limpiar sesión si usas carrito de servidor
+      session[:cart] = [] 
+
+      # 5. Respuesta de éxito (dentro de la transacción)
+      render json: { message: "Venta exitosa", sale_id: sale.id }, status: :ok
     end
-  rescue ActiveRecord::Rollback => e
-    render json: { error: e.message }, status: :unprocessable_entity
+
   rescue => e
-    render json: { error: "Error al procesar la compra: #{e.message}" }, status: :unprocessable_entity
+    # Si algo falla (stock, base de datos, etc.), se cancela todo y enviamos el error
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 end

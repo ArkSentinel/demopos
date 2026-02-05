@@ -96,10 +96,10 @@
       }
     </style>
   </head>
-
+ 
   <body>
     <% if user_signed_in? %>
-      <nav class="position-fixed d-flex flex-column shadow" id="sidebar">
+      <nav class="position-fixed d-flex flex-column shadow" id="sidebar" data-turbo-prefetch="false">
         <div class="sidebar-header">
           <div class="d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-bold text-white">POS<span class="text-info">System</span></h5>
@@ -177,15 +177,16 @@
         const sidebar = document.getElementById("sidebar");
         
         if (btn && sidebar) {
-          // Usamos una función limpia para evitar duplicados de eventos con Turbo
-          btn.onclick = (e) => {
+          // Eliminamos cualquier listener previo por si acaso
+          btn.replaceWith(btn.cloneNode(true));
+          const newBtn = document.getElementById("toggleSidebar");
+
+          newBtn.addEventListener("click", (e) => {
             e.preventDefault();
             sidebar.classList.toggle("collapsed");
-            // Guardar estado en localStorage si quieres que persista
             localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
-          };
+          });
 
-          // Opcional: Recuperar estado anterior
           if (localStorage.getItem('sidebar-collapsed') === 'true') {
             sidebar.classList.add('collapsed');
           }

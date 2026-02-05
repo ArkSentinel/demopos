@@ -8,7 +8,6 @@
 
   .pos-wrapper { max-width: 100%; overflow-x: hidden; }
   
-  /* Tarjetas de Producto */
   .product-card {
     border-radius: 12px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -35,12 +34,11 @@
     object-fit: cover;
   }
 
-  /* Badge de precio */
   .price-tag {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    background: rgba(13, 110, 253, 0.9); /* Color primario con transparencia */
+    background: rgba(13, 110, 253, 0.9);
     color: white;
     padding: 2px 12px;
     border-radius: 8px;
@@ -50,7 +48,6 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
-  /* Carrito Sticky Lateral */
   #cart-sticky {
     position: sticky;
     top: 20px;
@@ -67,7 +64,6 @@
     max-height: 450px;
   }
 
-  /* Personalización de scrollbar para el carrito */
   .cart-items-container::-webkit-scrollbar { width: 6px; }
   .cart-items-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 </style>
@@ -75,7 +71,7 @@
 <div class="container-fluid px-4 py-4 pos-wrapper">
   <div class="row g-4">
     
-    <div class="col-xxl-9 col-xl-8 col-lg-7">
+    <div id="products-section" class="col-xxl-9 col-xl-8 col-lg-7">
       
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <h2 class="fw-bold text-dark mb-0"><i class="bi bi-grid-fill me-2 text-primary"></i>Catálogo</h2>
@@ -150,7 +146,7 @@
       </div>
     </div>
 
-    <div class="col-xxl-3 col-xl-4 col-lg-5">
+    <div id="cart-section" class="col-xxl-3 col-xl-4 col-lg-5">
       <div id="cart-sticky" class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
         <div class="card-header bg-dark text-white py-3 border-0">
           <div class="d-flex justify-content-between align-items-center">
@@ -167,16 +163,11 @@
                   <th class="ps-3 py-3" style="font-size: 0.75rem;">Item</th>
                   <th class="text-center py-3" style="font-size: 0.75rem;">Cant.</th>
                   <th class="text-end pe-3 py-3" style="font-size: 0.75rem;">Subtotal</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="cart-body">
-                <tr>
-                  <td colspan="3" class="text-center py-5 text-muted">
-                    <i class="bi bi-basket2 h1 d-block opacity-25"></i>
-                    El carrito está vacío
-                  </td>
-                </tr>
-              </tbody>
+                </tbody>
             </table>
           </div>
         </div>
@@ -192,7 +183,7 @@
             <span id="cart-total" class="h3 mb-0 fw-bold text-primary">$0</span>
           </div>
           <button id="checkout-btn" class="btn btn-success btn-lg w-100 fw-bold shadow-sm py-3" style="border-radius: 12px;">
-            <i class="bi bi-cash-stack me-2"></i> COBRAR AHORA
+            <i class="bi bi-cash-stack me-2"></i> Finalizar compra
           </button>
         </div>
       </div>
