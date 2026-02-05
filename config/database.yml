@@ -20,5 +20,5 @@ production:
   adapter: postgresql
   encoding: unicode
   url: <%= ENV["DATABASE_URL"] %>
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  # En producción NO ponemos la sección variables con journal_mode
+  pool: 5
+  connect_timeout: 5
